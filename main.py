@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
 import datetime
 from fastapi.responses import JSONResponse
+import aiosmtplib
+from email.message import EmailMessage
 
 app = FastAPI()
 
@@ -22,24 +24,37 @@ def validate_email(email: str) -> bool:
     return re.match(pattern, email) is not None
 
 
-async def generate_random_token():
-    yield {"token": secrets.token_urlsafe(32)}
-
-
 async def send_email(to_email, link):
-    pass
+
+    try:
+        msg = EmailMessage()
+
+        msg["From"] = "therazz007@gmail.com"
+        msg["To"] = to_email
+        msg["Subject"] = "Email Verification"
+        msg.set_content(f"Click the link to verify your email\n: {link}")
+
+        await aiosmtplib.send(
+            msg,
+            hostname="smtp.gmail.com",
+            port=587,
+            username="therazz007@gmail.com",
+            password="pdvygjaahwtrftvz",
+            start_tls=True,
+        )
+        return True
+    except Exception as e:
+        return False
 
 
-async def register_user(
-    request: UserRegister, generate_token=Depends(generate_random_token)
-):
+async def register_user(request: UserRegister):
 
     if not validate_email(request.email):
         return JSONResponse(
             status_code=404, content={"message": "Please enter Valid Email."}
         )
 
-    otp_token = generate_token()
+    otp_token = secrets.token_urlsafe(16)
     db[request.email] = {
         "username": request.username,
         "password": request.password,
@@ -52,7 +67,12 @@ async def register_user(
     verify_email_status = await send_email(request.email, verification_link)
 
     if not verify_email_status:
-        pass
+        return JSONResponse(
+            status_code=404,
+            content={
+                "message": "Failed to Send Verification Email",
+            },
+        )
 
     return JSONResponse(
         status_code=200,
