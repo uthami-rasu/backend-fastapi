@@ -2,3 +2,5 @@ fastapi
 uvicorn
 jwt
 aiosmtplib
+asyncpg
+jose
