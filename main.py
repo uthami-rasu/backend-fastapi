@@ -47,7 +47,7 @@ def validate_email(email: str) -> bool:
 
 async def send_verification_email(recipient_email, user_name, token):
     sender_email = "therazz007@gmail.com"
-    verification_link = f"http://localhost:3000/verify-email?token={token}"
+    verification_link = f"https://ng2567-3000.csb.app/verify-email?token={token}"
 
     # Create email message
     msg = EmailMessage()
@@ -204,17 +204,17 @@ class TokenBody(BaseModel):
 def short_token_verification(request: TokenBody):
     token = request.token
     if token not in verification_tokens:
-        raise HTTPException(status_code=404, detail={"message": "Invalid Token"})
+        raise HTTPException(status_code=404, detail="Invalid Token")
 
     data = verification_tokens[token]
 
     if datetime.now(timezone.utc) > data["expires_at"]:
-        raise HTTPException(status_code=400, detail={"message": "Token Expired"})
+        raise HTTPException(status_code=400, detail="Token Expired")
 
     email = data["email"]
 
     if email not in db:
-        raise HTTPException(status_code=404, detail={"message": "Unauthrized User"})
+        raise HTTPException(status_code=404, detail="Unauthrized User")
 
     db[email]["isVerified"] = True
     del verification_tokens[token]
@@ -252,8 +252,8 @@ def token_verification(token: str):
             status_code=201, content={"message": "Email Verified Successfully"}
         )
     except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail={"message": "Token has expired"})
+        raise HTTPException(status_code=401, detail="Token has expired")
     except jwt.InvalidTokenError:
-        raise HTTPException(status_code=400, detail={"message": "Invalid token"})
+        raise HTTPException(status_code=400, detail="Invalid token")
     except Exception as e:
-        raise HTTPException(status_code=500, detail={"message": str(e)})
+        raise HTTPException(status_code=500, detail=str(e))
