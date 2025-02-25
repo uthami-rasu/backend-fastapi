@@ -1,43 +1,37 @@
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
-import datetime
 from fastapi.responses import JSONResponse
-import aiosmtplib
 from email.message import EmailMessage
-
 from fastapi.middleware.cors import CORSMiddleware
+import secrets
+import jwt
+import re
+import json
+import string
+import aiosmtplib
+from datetime import timezone, datetime, timedelta
+import uuid
 
 app = FastAPI()
 
-
-# Define allowed origins (Frontend URL)
 origins = [
-    "https://ng2567-3000.csb.app/",
-    "https://ng2567-3000.csb.app",  # React Dev Server
+    "https://ng2567-3000.csb.app",  # Add your frontend URL here
 ]
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,  # Allowed domains
-    allow_credentials=False,
-    allow_methods=["*"],  # Allow all HTTP methods
-    allow_headers=["*"],  # Allow all headers
+    allow_origins=origins,  # Allow specific frontend origins
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Explicitly allow POST
+    allow_headers=["Content-Type", "Authorization"],  # Allow required headers
 )
 
 
-import secrets
-import re
-import json
+db = {}
+SECRET_KEY = secrets.token_hex(16)
 
-db = {
-    "razz@yopmail.com": {
-        "username": "Razz",
-        "password": "wdad",
-        "token": "q5StCl5J2dT94TiFfKZzxA",
-        "isVerified": False,
-    }
-}
+
+verification_tokens = {}
 
 
 class UserRegister(BaseModel):
@@ -49,10 +43,6 @@ class UserRegister(BaseModel):
 def validate_email(email: str) -> bool:
     pattern = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"
     return re.match(pattern, email) is not None
-
-
-import aiosmtplib
-from email.message import EmailMessage
 
 
 async def send_verification_email(recipient_email, user_name, token):
@@ -140,6 +130,19 @@ async def send_verification_email(recipient_email, user_name, token):
         return False
 
 
+import random
+
+
+def generate_token(email: str):
+
+    expire = datetime.now(timezone.utc) + timedelta(minutes=10)
+    token = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+    verification_tokens[token] = {"email": email, "expires_at": expire}
+
+    return token
+
+
 @app.post("/api/v1/register-user")
 async def register_user(request: UserRegister):
 
@@ -148,10 +151,10 @@ async def register_user(request: UserRegister):
 
     if not validate_email(request.email):
         return JSONResponse(
-            status_code=404, content={"message": "Please enter Valid Email."}
+            status_code=401, content={"message": "Please enter Valid Email."}
         )
 
-    token = secrets.token_urlsafe(4)
+    token = generate_token(request.email)
     db[request.email] = {
         "username": request.username,
         "password": request.password,
@@ -165,14 +168,14 @@ async def register_user(request: UserRegister):
 
     if not verify_email_status:
         return JSONResponse(
-            status_code=404,
+            status_code=500,
             content={
                 "message": "Failed to Send Verification Email",
             },
         )
 
     return JSONResponse(
-        status_code=200,
+        status_code=201,
         content={
             "message": "User registered! Check your email to verify your account."
         },
@@ -186,15 +189,71 @@ def get_all_users():
 
 
 # method-3
-@app.get("/api/auth/verify-token")
+
+
+@app.options("/{full_path:path}")
+async def preflight(full_path: str):
+    return {"message": "Preflight request received."}
+
+
+class TokenBody(BaseModel):
+    token: str
+
+
+@app.post("/api/auth/verify-token")
+def short_token_verification(request: TokenBody):
+    token = request.token
+    if token not in verification_tokens:
+        raise HTTPException(status_code=404, detail={"message": "Invalid Token"})
+
+    data = verification_tokens[token]
+
+    if datetime.now(timezone.utc) > data["expires_at"]:
+        raise HTTPException(status_code=400, detail={"message": "Token Expired"})
+
+    email = data["email"]
+
+    if email not in db:
+        raise HTTPException(status_code=404, detail={"message": "Unauthrized User"})
+
+    db[email]["isVerified"] = True
+    del verification_tokens[token]
+
+    return JSONResponse(
+        status_code=200, content={"message": "Email Verified Successfully"}
+    )
+
+
 def token_verification(token: str):
 
-    for email, user in db.items():
-        if user["token"] == token:
-            db[email]["isVerified"] = True
+    try:
+        # payload = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
+        # email = payload["sub"]
+        # nonce = payload["nonce"]
+
+        # if nonce in used_tokens:
+        #     raise HTTPException(
+        #         status_code=400, detail={"message": "This token has already been used"}
+        #     )
+        # used_tokens.add(nonce)
+        # if email not in db:
+        #     raise HTTPException(
+        #         status_code=404, detail={"message": "Unauthorized Access"}
+        #     )
+
+        # if db[email]["token"] != token:
+        #     raise HTTPException(status_code=400, detail={"message": "Invalid Token"})
+
+        # db[email]["isVerified"] = True
+        # db[email][token] = ""
+        pass
 
         return JSONResponse(
             status_code=201, content={"message": "Email Verified Successfully"}
         )
-
-    return HTTPException(status_code=404, detail={"Invalid or Expired Token"})
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail={"message": "Token has expired"})
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=400, detail={"message": "Invalid token"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail={"message": str(e)})
