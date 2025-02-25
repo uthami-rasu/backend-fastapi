@@ -147,7 +147,7 @@ def generate_token(email: str):
 async def register_user(request: UserRegister):
 
     if request.email in db:
-        pass
+        raise HTTPException(status_code=409, detail="User Already Exists")
 
     if not validate_email(request.email):
         return JSONResponse(
