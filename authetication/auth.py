@@ -92,6 +92,7 @@ async def verify_token(req: VerifyToken, dbs: AsyncSession = Depends(get_db)):
 
 def get_current_user(request: Request):
     token = request.cookies.get("access_token")
+    print(token, "checking")
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     try:
@@ -126,8 +127,8 @@ async def login(
         value=token,
         httponly=True,
         max_age=TOKEN_EXPIRE_IN_DAYS * 60 * 60 * 24,
-        secure=False,  # Change to True in production with HTTPS!
-        samesite="lax",
+        secure=True,  # Change to True in production with HTTPS!
+        samesite="Lax",
     )
     return JSONResponse(status_code=201, content="Login Successful")
 
