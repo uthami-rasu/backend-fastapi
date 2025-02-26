@@ -6,3 +6,4 @@ asyncpg
 jose
 sqlalchemy
 psycopg2
+passlib
