@@ -68,14 +68,16 @@ async def register_user(request: UserRegister, dbs: AsyncSession = Depends(get_d
 
 @auth.post("/auth/verify-email")
 async def verify_token(req: VerifyToken, dbs: AsyncSession = Depends(get_db)):
-    result = await dbs.execute(select(User).filter(User.email == req.email))
+    result = await dbs.execute(
+        select(User).filter(User.verification_token == req.token)
+    )
     user = result.scalar_one_or_none()
 
     if not user:
         raise HTTPException(status_code=404, detail="Unauthorized Access")
 
-    if user.verification_token != req.token:
-        raise HTTPException(status_code=401, detail="Invalid Token")
+    # if user.verification_token != req.token:
+    #     raise HTTPException(status_code=401, detail="Invalid Token")
 
     # Update the user verification status
     user.verification_token = None

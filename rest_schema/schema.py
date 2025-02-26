@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class UserRegister(BaseModel):
@@ -8,7 +9,7 @@ class UserRegister(BaseModel):
 
 
 class VerifyToken(BaseModel):
-    email: str
+    email: Optional[str]
     token: str
 
 
