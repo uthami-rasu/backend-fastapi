@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-jwt
+pyjwt
 aiosmtplib
 asyncpg
 jose

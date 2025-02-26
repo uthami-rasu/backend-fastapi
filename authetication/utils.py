@@ -15,8 +15,10 @@ TOKEN_EXPIRE_IN_DAYS = 7
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-def validate_password(plain_pwd:str,hashed_pwd) -> bool:
-    return pwd_context.verify(plain_pwd,hashed_pwd)
+
+def validate_password(plain_pwd: str, hashed_pwd) -> bool:
+    return pwd_context.verify(plain_pwd, hashed_pwd)
+
 
 def hash_password(password: str) -> str:
     return pwd_context.hash(password)
@@ -122,8 +124,6 @@ def generate_jwt_token(email: str):
 
     payload = {"sub": email, "expire": expire.timestamp()}
 
-    token = jwt.encode(
-        payload=payload,key=SECRET_KEY,algorithm=ALGORITHM
-    )
+    token = jwt.encode(payload=payload, key=SECRET_KEY, algorithm=ALGORITHM)
 
     return token
