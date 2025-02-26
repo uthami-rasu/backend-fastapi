@@ -121,6 +121,10 @@ async def login(
 
     token = generate_jwt_token(req.email)
 
+    response = JSONResponse(
+        status_code=201, 
+        content={"message": "Login Successful"}
+    )
     # Set cookie (secure=True should be used with HTTPS)
     response.set_cookie(
         key="access_token",
@@ -130,7 +134,7 @@ async def login(
         secure=True,  # Change to True in production with HTTPS!
         samesite="Lax",
     )
-    return JSONResponse(status_code=201, content="Login Successful")
+    return response
 
 
 @auth.get("/auth/me")
