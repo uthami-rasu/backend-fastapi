@@ -9,7 +9,7 @@ class UserRegister(BaseModel):
 
 
 class VerifyToken(BaseModel):
-    email: Optional[str]
+    # email: Optional[str]
     token: str
 
 
