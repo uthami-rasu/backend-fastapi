@@ -4,3 +4,5 @@ jwt
 aiosmtplib
 asyncpg
 jose
+sqlalchemy
+psycopg2
