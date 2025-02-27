@@ -134,6 +134,17 @@ async def login(
     return response
 
 
+@auth.get("/auth/me")
+async def get_me(user: dict = Depends(get_current_user),dbs:AsyncSession=Depends(get_db)):
+    """
+    Auto-login check:
+    Returns user details if the JWT cookie is valid.
+    """
+    user = await db.existing_user(dbs,user.email,return_result=True)
+    username = user.username
+    return {"authenticated": True, "user": username}
+
+
 @auth.post("/auth/logout", status_code=status.HTTP_200_OK)
 async def logout(response: Response):
     """
