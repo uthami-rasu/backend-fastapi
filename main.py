@@ -24,7 +24,7 @@ app = FastAPI(lifespan=lifespan)
 
 origins = [
     "https://ng2567-3000.csb.app",
-    "https://razz-dev.netlify.app"/# Add your frontend URL here
+    "https://razz-dev.netlify.app"
 ]
 
 app.add_middleware(
