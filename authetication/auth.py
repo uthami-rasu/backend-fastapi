@@ -150,7 +150,7 @@ async def logout(response: Response):
     Deletes the authentication cookie.
     """
     response.delete_cookie("access_token")
-    return {"message": "Logged out"}
+    return response
 
 
 # ----------------------------
