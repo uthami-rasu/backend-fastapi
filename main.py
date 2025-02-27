@@ -23,7 +23,8 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 origins = [
-    "https://ng2567-3000.csb.app",  # Add your frontend URL here
+    "https://ng2567-3000.csb.app",
+    "https://razz-dev.netlify.app"/# Add your frontend URL here
 ]
 
 app.add_middleware(
