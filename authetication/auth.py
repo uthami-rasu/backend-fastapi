@@ -134,11 +134,6 @@ async def login(
     return response
 
 
-from fastapi import APIRouter, Response, status
-
-auth = APIRouter()
-
-
 @auth.post("/auth/logout", status_code=status.HTTP_200_OK)
 async def logout(response: Response):
     """
@@ -152,35 +147,3 @@ async def logout(response: Response):
         path="/",  # Important to match cookie path
     )
     return {"message": "Logged out"}
-
-
-@auth.post("/auth/logout")
-async def logout(response: Response):
-    """
-    Logout endpoint:
-    Deletes the authentication cookie.
-    """
-    response.delete_cookie("access_token", httponly=True, samesite="None")
-    return response
-
-
-# ----------------------------
-# Protected Router
-# ----------------------------
-protected_router = APIRouter()
-
-
-@protected_router.get("/dashboard")
-async def dashboard(user: dict = Depends(get_current_user)):
-    """
-    Protected route:
-    Accessible only if the user is authenticated.
-    """
-    return {"message": f"Welcome {user['email']}! This is your dashboard."}
-
-
-# ----------------------------
-# Include Routers in the App
-# ----------------------------
-# app.include_router(auth, prefix="/auth")
-# app.include_router(protected_router, prefix="/api")
