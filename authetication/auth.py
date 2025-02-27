@@ -134,13 +134,24 @@ async def login(
     return response
 
 
-@auth.get("/auth/me")
-async def get_me(user: dict = Depends(get_current_user)):
+from fastapi import APIRouter, Response, status
+
+auth = APIRouter()
+
+
+@auth.post("/auth/logout", status_code=status.HTTP_200_OK)
+async def logout(response: Response):
     """
-    Auto-login check:
-    Returns user details if the JWT cookie is valid.
+    Logout endpoint: Deletes the authentication cookie.
     """
-    return {"authenticated": True, "user": user}
+    response.delete_cookie(
+        key="access_token",
+        httponly=True,
+        secure=True,  # Must match token setting
+        samesite="None",  # Must match token setting
+        path="/",  # Important to match cookie path
+    )
+    return {"message": "Logged out"}
 
 
 @auth.post("/auth/logout")
