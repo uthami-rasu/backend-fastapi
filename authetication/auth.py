@@ -106,6 +106,7 @@ def get_current_user(request: Request):
 
 
 async def handle_verification_process(*args):
+
     verify_email_status = await send_verification_email(*args)
 
     if not verify_email_status:
@@ -129,13 +130,14 @@ async def login(
     """
 
     user = await db.existing_user(dbs=dbs, email=req.email, return_result=True)
-    token = generate_jwt_token(req.email)
 
     if not user or not validate_password(req.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid Credentials")
     if not user.is_verified:
-        return await handle_verification_process(req.email, user.username, token)
-
+        return await handle_verification_process(
+            req.email, user.username, user.verification_token
+        )
+    token = generate_jwt_token(req.email)
     response = JSONResponse(status_code=201, content={"message": "Login Successful"})
     # Set cookie (secure=True should be used with HTTPS)
     response.set_cookie(
