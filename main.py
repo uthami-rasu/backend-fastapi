@@ -24,7 +24,8 @@ app = FastAPI(lifespan=lifespan)
 
 origins = [
     "https://ng2567-3000.csb.app",
-    "https://razz-dev.netlify.app"
+    "https://razz-dev.netlify.app",
+    "https://2gz3yp-3000.csb.app"
 ]
 
 app.add_middleware(
