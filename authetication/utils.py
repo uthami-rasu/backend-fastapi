@@ -42,7 +42,7 @@ def generate_token(length: int = 6) -> str:
 
 async def send_verification_email(recipient_email, user_name, token):
 
-    verification_link = f"{os.getenv("APP_URL")}?token={token}"
+    verification_link = f"{os.getenv('APP_URL')}?token={token}"
 
     # Create email message
     msg = EmailMessage()
