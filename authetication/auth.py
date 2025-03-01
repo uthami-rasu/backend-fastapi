@@ -12,6 +12,7 @@ from models import *
 from rest_schema import *
 from .utils import *
 
+
 url = "postgresql+psycopg2://razz_kutty:Q5jE2MhNPP4dJtEWwcj2un2Yu0qW3D6z@dpg-cuuu2ktds78s73b516ig-a.singapore-postgres.render.com:5432/razz_dev_users"
 
 db = SingletonDB(url)
@@ -104,6 +105,19 @@ def get_current_user(request: Request):
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
+async def handle_verification_process(*args):
+    verify_email_status = await send_verification_email(*args)
+
+    if not verify_email_status:
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to Send Verification Email",
+        )
+    return JSONResponse(
+        status_code=202, content={"message": "Check your email to verify your account."}
+    )
+
+
 @auth.post("/auth/login")
 async def login(
     response: Response, req: LoginSchema, dbs: AsyncSession = Depends(get_db)
@@ -115,11 +129,12 @@ async def login(
     """
 
     user = await db.existing_user(dbs=dbs, email=req.email, return_result=True)
+    token = generate_jwt_token(req.email)
 
     if not user or not validate_password(req.password, user.password):
         raise HTTPException(status_code=401, detail="Invalid Credentials")
-
-    token = generate_jwt_token(req.email)
+    if not user.is_verified:
+        return await handle_verification_process(req.email, user.username, token)
 
     response = JSONResponse(status_code=201, content={"message": "Login Successful"})
     # Set cookie (secure=True should be used with HTTPS)

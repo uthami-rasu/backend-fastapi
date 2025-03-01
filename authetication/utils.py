@@ -8,6 +8,12 @@ import secrets
 from passlib.context import CryptContext
 from datetime import datetime, timezone, timedelta
 
+from dotenv import load_dotenv
+import os
+
+# load environment variables
+load_dotenv()
+
 SECRET_KEY = secrets.token_hex(16)
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_IN_DAYS = 7
@@ -35,12 +41,12 @@ def generate_token(length: int = 6) -> str:
 
 
 async def send_verification_email(recipient_email, user_name, token):
-    sender_email = "therazz007@gmail.com"
-    verification_link = f"https://ng2567-3000.csb.app/verify-email?token={token}"
+
+    verification_link = f"{os.getenv("APP_URL")}?token={token}"
 
     # Create email message
     msg = EmailMessage()
-    msg["From"] = sender_email
+    msg["From"] = os.getenv("SENDER_EMAIL_ID")
     msg["To"] = recipient_email
     msg["Subject"] = "Verify Your Email"
 
@@ -99,23 +105,23 @@ async def send_verification_email(recipient_email, user_name, token):
     msg.add_alternative(html_content, subtype="html")
 
     # SMTP Configuration
-    smtp_server = "smtp.gmail.com"
-    smtp_port = 587
-    smtp_username = "therazz007@gmail.com"
-    smtp_password = "pdvygjaahwtrftvz"
+    # smtp_server = "smtp.gmail.com"
+    # smtp_port = 587
+    # smtp_username = os.getenv("SENDER_EMAIL_ID")
 
     try:
         await aiosmtplib.send(
             msg,
-            hostname=smtp_server,
-            port=smtp_port,
-            username=smtp_username,
-            password=smtp_password,
+            hostname=os.getenv("SMTP_SERVER"),
+            port=os.getenv("SMTP_PORT"),
+            username=os.getenv("SENDER_EMAIL_ID"),
+            password=os.getenv("SENDER_EMAIL_PASSWORD"),
             use_tls=False,
             start_tls=True,
         )
         return True
     except Exception as e:
+        print(e)
         return False
 
 
