@@ -8,10 +8,14 @@ from sqlalchemy.exc import IntegrityError
 from contextlib import asynccontextmanager
 from sqlalchemy import Column, Integer, String, Boolean, text
 from sqlalchemy.future import select
+import os 
+from dotenv import load_env
+
+load_env()
 
 
-# ✅ Use asyncpg for PostgreSQL
-DATABASE_URL = "postgresql+asyncpg://razz_kutty:Q5jE2MhNPP4dJtEWwcj2un2Yu0qW3D6z@dpg-cuuu2ktds78s73b516ig-a.singapore-postgres.render.com:5432/razz_dev_users"
+#  Use asyncpg for PostgreSQL
+DATABASE_URL = os.getenv("DATABASE_ENDPOINT")
 
 Base = declarative_base()
 
@@ -83,13 +87,13 @@ class SingletonDB:
         return user if return_result else user is not None
 
 
-# ✅ Ensure SingletonDB is initialized before calling `init_db`
+
 db = SingletonDB(DATABASE_URL)
 if db.engine is None:
     raise RuntimeError("Database engine initialization failed!")
 
 
-# ✅ Async function to initialize DB tables
+
 async def init_db():
     async with db.engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
