@@ -9,7 +9,7 @@ from contextlib import asynccontextmanager
 from sqlalchemy import Column, Integer, String, Boolean, text
 from sqlalchemy.future import select
 import os 
-from dotenv import load_env
+from dotenv import load_dotenv
 
 load_env()
 
