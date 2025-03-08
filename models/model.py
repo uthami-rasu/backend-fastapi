@@ -11,7 +11,7 @@ from sqlalchemy.future import select
 import os 
 from dotenv import load_dotenv
 
-load_env()
+load_dotenv()
 
 
 #  Use asyncpg for PostgreSQL
