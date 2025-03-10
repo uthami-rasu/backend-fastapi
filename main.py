@@ -10,6 +10,7 @@ from authetication import auth as AuthRouter
 from models import *
 from authetication.auth import *
 from rest_schema import *
+from models import task_router as TaskRouter 
 
 
 @asynccontextmanager
@@ -25,19 +26,20 @@ app = FastAPI(lifespan=lifespan)
 origins = [
     "https://ng2567-3000.csb.app",
     "https://razz-dev.netlify.app",
-    "https://2gz3yp-3000.csb.app"
+    "https://2gz3yp-3000.csb.app",
+    
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # Allow specific frontend origins
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Explicitly allow POST
+    allow_methods=["GET", "POST","PATCH", "PUT", "DELETE", "OPTIONS"],  # Explicitly allow POST
     allow_headers=["Content-Type", "Authorization"],  # Allow required headers
 )
 
 app.include_router(AuthRouter)
-
+app.include_router(TaskRouter,prefix="/api/tasks")
 
 @app.get("/api/v1/users")
 async def get_all_users(dbs: AsyncSession = Depends(get_db)):

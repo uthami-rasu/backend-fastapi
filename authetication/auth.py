@@ -10,20 +10,11 @@ from sqlalchemy.future import select
 # User imports
 from models import *
 from rest_schema import *
-from .utils import *
+from .auth_utils import *
+from utility import * 
 
-
-url = "postgresql+psycopg2://razz_kutty:Q5jE2MhNPP4dJtEWwcj2un2Yu0qW3D6z@dpg-cuuu2ktds78s73b516ig-a.singapore-postgres.render.com:5432/razz_dev_users"
-
-db = SingletonDB(url)
 
 auth = APIRouter()
-
-
-async def get_db():
-    async with db.get_db() as session:
-        yield session
-
 
 @auth.post("/api/v1/register-user")
 async def register_user(request: UserRegister, dbs: AsyncSession = Depends(get_db)):

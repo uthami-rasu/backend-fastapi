@@ -7,4 +7,5 @@ jose
 sqlalchemy
 psycopg2
 passlib
-dotenv
+dotenv 
+asyncpg
