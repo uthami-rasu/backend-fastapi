@@ -48,7 +48,7 @@ class UserTasks(Base):
     last_modified = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now(), nullable=False)  # Fix here
     
     duedate = Column(DateTime(timezone=True), nullable=False,default=func.now())
-    is_completed = Column(Boolean, nullable=False, default=False)
+    is_completed = Column(String(3), nullable=False, default="no")
     is_favor = Column(Boolean, nullable=False, default=False)
     color = Column(String(255),default="blue",nullable=True)
 
