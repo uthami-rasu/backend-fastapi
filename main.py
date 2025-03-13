@@ -27,6 +27,7 @@ origins = [
     "https://razz-dev.netlify.app",
     "https://*.csb.app",
     "https://nsknlv-3000.csb.app",
+    "https://ng2567-3000.csb.app"
 ]
 
 app.add_middleware(

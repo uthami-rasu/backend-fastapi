@@ -36,7 +36,7 @@ class Task(BaseModel):
     title : str = "No Title"
     description : str = ""
     status : str ="low"
-    is_completed:bool = False
+    is_completed:str = "no"
     is_favor:bool = False 
     duedate:datetime = datetime.now(timezone.utc)
     color:str = "blue"
@@ -47,11 +47,11 @@ class DeleteTask(BaseModel):
     task_id : str = "" 
 
 class UpdateTask(BaseModel):
-    task_id: str
+    task_id: str 
     title: Optional[str] = None  
     description: Optional[str] = None
     status: Optional[str] = None
-    is_completed: Optional[bool] = None
+    is_completed: Optional[str] = None
     is_favor: Optional[bool] = None
     duedate: Optional[datetime] = None
     color: Optional[str] = None
