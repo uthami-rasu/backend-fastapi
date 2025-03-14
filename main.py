@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
+#from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
