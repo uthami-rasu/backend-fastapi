@@ -82,7 +82,7 @@ async def update_task(task:UpdateTask,dbs:AsyncSession=Depends(get_db)):
     await dbs.refresh(prevtask)  # Refresh instance with updated data
 
     return prevtask
-@app.options("/")
+@task_router.options("/")
 async def preflight_tasks():
     """Handles preflight requests for PATCH and other methods."""
     headers = {
