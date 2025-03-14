@@ -42,7 +42,7 @@ app.add_middleware(
         "DELETE",
         "OPTIONS",
     ],  # Explicitly allow POST
-    allow_headers=["Content-Type", "Authorization"],
+    allow_headers=["Content-Type", "Authorization"]
 )
 
 app.include_router(AuthRouter)
