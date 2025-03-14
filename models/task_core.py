@@ -1,4 +1,5 @@
 from fastapi import Request, APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import (
     AsyncSession)
 from sqlalchemy.future import select
@@ -81,4 +82,13 @@ async def update_task(task:UpdateTask,dbs:AsyncSession=Depends(get_db)):
     await dbs.refresh(prevtask)  # Refresh instance with updated data
 
     return prevtask
-
+@app.options("/")
+async def preflight_tasks():
+    """Handles preflight requests for PATCH and other methods."""
+    headers = {
+        "Access-Control-Allow-Origin": "*",  # Adjust for security
+        "Access-Control-Allow-Methods": "GET, POST, PATCH, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Credentials": "true",
+    }
+    return JSONResponse(content={"message": "Preflight request allowed"}, headers=headers)
