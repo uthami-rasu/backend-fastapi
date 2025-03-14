@@ -10,6 +10,7 @@ from authetication import auth as AuthRouter
 from models import *
 from authetication.auth import *
 from rest_schema import *
+from models import task_router as TaskRouter
 
 
 @asynccontextmanager
@@ -23,20 +24,29 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 origins = [
-    "https://ng2567-3000.csb.app",
     "https://razz-dev.netlify.app",
-    "https://2gz3yp-3000.csb.app"
+    "https://*.csb.app",
+    "https://nsknlv-3000.csb.app",
+    "https://ng2567-3000.csb.app"
 ]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,  # Allow specific frontend origins
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS","PATCH"],  # Explicitly allow POST
-    allow_headers=["Content-Type", "Authorization"],  # Allow required headers
+    allow_methods=[
+        "GET",
+        "POST",
+        "PATCH",
+        "PUT",
+        "DELETE",
+        "OPTIONS",
+    ],  # Explicitly allow POST
+    allow_headers=["Content-Type", "Authorization"]
 )
 
 app.include_router(AuthRouter)
+app.include_router(TaskRouter, prefix="/api/tasks")
 
 
 @app.get("/api/v1/users")
@@ -66,15 +76,15 @@ async def delete_all_users(dbs: AsyncSession = Depends(get_db)):
 
 # # method-3
 
-@app.post('/api/test')
-async def test(email:str,dbs=Depends(get_db)):
 
-    r = await db.existing_user(dbs,email,True)
+@app.post("/api/test")
+async def test(email: str, dbs=Depends(get_db)):
+
+    r = await db.existing_user(dbs, email, True)
 
     return r
 
 
-    
 # @app.options("/{full_path:path}")
 # async def preflight(full_path: str):
 #     return {"message": "Preflight request received."}

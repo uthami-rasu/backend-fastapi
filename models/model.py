@@ -3,14 +3,15 @@ from sqlalchemy.ext.asyncio import (
     AsyncSession,
     create_async_engine,
 )
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from sqlalchemy.exc import IntegrityError
 from contextlib import asynccontextmanager
-from sqlalchemy import Column, Integer, String, Boolean, text
+from sqlalchemy import Column, Integer, Text, String, Boolean, text,ForeignKey, DateTime
 from sqlalchemy.future import select
 import os 
 from dotenv import load_dotenv
-
+from datetime import datetime,timezone
+from sqlalchemy.sql import func 
 load_dotenv()
 
 
@@ -29,6 +30,31 @@ class User(Base):
     password = Column(String(255), nullable=False)  # Store hashed password
     is_verified = Column(Boolean, default=False, nullable=False)  # Initially False
     verification_token = Column(String(255), unique=True, nullable=True)  # Store token
+
+    # make a relationship between tables
+    tasks = relationship("UserTasks",back_populates="user")
+
+
+class UserTasks(Base):
+    __tablename__ = "user_tasks"
+
+    task_id = Column(String(6), primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    title = Column(Text, nullable=False)
+    description = Column(Text, nullable=True)
+    status = Column(String(255), nullable=False)
+    
+    created_at = Column(DateTime(timezone=True), default=func.now(),nullable=False)  
+    last_modified = Column(DateTime(timezone=True), default=func.now(), onupdate=func.now(), nullable=False)  # Fix here
+    
+    duedate = Column(DateTime(timezone=True), nullable=False,default=func.now())
+    is_completed = Column(String(3), nullable=False, default="no")
+    is_favor = Column(Boolean, nullable=False, default=False)
+    color = Column(String(255),default="blue",nullable=True)
+
+    # Relationship to users table
+    user = relationship("User", back_populates="tasks")
+
 
 
 class SingletonDB:
