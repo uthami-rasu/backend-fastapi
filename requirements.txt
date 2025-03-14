@@ -9,3 +9,4 @@ psycopg2
 passlib
 dotenv 
 asyncpg
+starlette
