@@ -49,7 +49,7 @@ async def send_verification_email(recipient_email, user_name, token):
     msg = EmailMessage()
     msg["From"] = os.getenv("SENDER_EMAIL_ID")
     msg["To"] = recipient_email
-    msg["Subject"] = "Verify Your Email"
+    msg["Subject"] = "TaskEase: Verify Your Email"
 
     # Set plain text fallback
     msg.set_content(
@@ -91,8 +91,8 @@ async def send_verification_email(recipient_email, user_name, token):
                 <p>If you didn’t request this, you can safely ignore this email.</p>
             </div>
             <div class="footer">
-                <p>Need help? Contact us at <a href="mailto:support@example.com">support@example.com</a></p>
-                <p>&copy; 2025 Your Company. All rights reserved.</p>
+                <p>Need help? Contact us at <a href="mailto:therazz007@gmail.com">razz@gmail.com</a></p>
+                <p>&copy; 2025 TaskEase Tech inc. All rights reserved.</p>
             </div>
         </div>
     </body>
