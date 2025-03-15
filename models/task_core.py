@@ -13,7 +13,7 @@ from .utils import *
 task_router = APIRouter()
 
 
-@task_router.get("")
+@task_router.get("/")
 async def task_test(user: dict = Depends(get_current_user), dbs=Depends(get_db)):
 
     if not user:
@@ -26,7 +26,7 @@ async def task_test(user: dict = Depends(get_current_user), dbs=Depends(get_db))
     return {"data": tasks}
 
 
-@task_router.post("")
+@task_router.post("/")
 async def create_task(
     *,
     user: dict = Depends(get_current_user),
@@ -50,7 +50,7 @@ async def create_task(
     return {"message": "Task created successfully", "task": new_task}
 
 
-@task_router.delete("")
+@task_router.delete("/")
 async def remove_task(task: DeleteTask, dbs: AsyncSession = Depends(get_db)):
 
     result = await dbs.execute(
@@ -98,7 +98,7 @@ async def update_task(
     return prevtask
 
 
-@task_router.options("")
+@task_router.options("/")
 async def preflight_tasks():
     """Handles preflight requests for PATCH and other methods."""
     headers = {
