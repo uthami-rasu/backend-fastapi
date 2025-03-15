@@ -60,7 +60,7 @@ async def remove_task(task:DeleteTask,dbs:AsyncSession=Depends(get_db)):
 
 
 
-@task_router.patch("/")
+@task_router.post("/modify")
 async def update_task(task:UpdateTask,dbs:AsyncSession=Depends(get_db)):
     
     task_id = task.task_id 
