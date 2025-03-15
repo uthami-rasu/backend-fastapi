@@ -13,7 +13,7 @@ from .utils import *
 task_router = APIRouter()
 
 
-@task_router.get("")
+@task_router.get("/")
 async def task_test(user: dict = Depends(get_current_user), dbs=Depends(get_db)):
 
     if not user:

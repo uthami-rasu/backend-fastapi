@@ -47,11 +47,11 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],
 )
 
-app.include_router(AuthRouter)
+app.include_router(AuthRouter, prefix="/api/auth")
 app.include_router(TaskRouter, prefix="/api/tasks")
 
 
-@app.get("/api/v1/users")
+@app.get("/api/users")
 async def get_all_users(dbs: AsyncSession = Depends(get_db)):
     result = await dbs.execute(select(User))
     users = result.scalars().all()

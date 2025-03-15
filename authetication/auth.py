@@ -16,7 +16,7 @@ from models import *
 auth = APIRouter()
 
 
-@auth.post("/api/v1/register-user")
+@auth.post("/register-user")
 async def register_user(request: UserRegister, dbs: AsyncSession = Depends(get_db)):
 
     user_exists = await db.existing_user(dbs, request.email)
@@ -58,7 +58,7 @@ async def register_user(request: UserRegister, dbs: AsyncSession = Depends(get_d
     )
 
 
-@auth.post("/auth/verify-email")
+@auth.post("/verify-email")
 async def verify_token(req: VerifyToken, dbs: AsyncSession = Depends(get_db)):
     result = await dbs.execute(
         select(User).filter(User.verification_token == req.token)
@@ -96,7 +96,7 @@ async def handle_verification_process(*args):
     )
 
 
-@auth.post("/auth/login")
+@auth.post("/login")
 async def login(
     response: Response, req: LoginSchema, dbs: AsyncSession = Depends(get_db)
 ):
@@ -130,7 +130,7 @@ async def login(
     return response
 
 
-@auth.get("/auth/me")
+@auth.get("/me")
 async def get_me(
     user: dict = Depends(get_current_user), dbs: AsyncSession = Depends(get_db)
 ):
@@ -143,7 +143,7 @@ async def get_me(
     return {"authenticated": True, "user": username}
 
 
-@auth.post("/auth/logout", status_code=status.HTTP_200_OK)
+@auth.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(response: Response):
     """
     Logout endpoint: Deletes the authentication cookie.
