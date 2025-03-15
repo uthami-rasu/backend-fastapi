@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.responses import JSONResponse
-#from fastapi.middleware.cors import CORSMiddleware
+
+# from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from sqlalchemy.future import select
@@ -28,7 +29,7 @@ origins = [
     "https://razz-dev.netlify.app",
     "https://*.csb.app",
     "https://nsknlv-3000.csb.app",
-    "https://ng2567-3000.csb.app"
+    "https://ng2567-3000.csb.app",
 ]
 
 app.add_middleware(
@@ -43,7 +44,7 @@ app.add_middleware(
         "DELETE",
         "OPTIONS",
     ],  # Explicitly allow POST
-    allow_headers=["Content-Type", "Authorization"]
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 app.include_router(AuthRouter)

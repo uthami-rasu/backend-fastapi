@@ -7,14 +7,15 @@ import jwt
 import secrets
 from passlib.context import CryptContext
 from datetime import datetime, timezone, timedelta
-
+from fastapi import Request, Response, HTTPException
 from dotenv import load_dotenv
 import os
+from .model import *
 
 # load environment variables
 load_dotenv()
 
-SECRET_KEY = secrets.token_hex(16)
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_IN_DAYS = 7
 
@@ -133,3 +134,20 @@ def generate_jwt_token(email: str):
     token = jwt.encode(payload=payload, key=SECRET_KEY, algorithm=ALGORITHM)
 
     return token
+
+
+def get_current_user(request: Request):
+    token = request.cookies.get("taskease_token")
+
+    print("Token", token)
+    print("-----------------------------------------------------------------")
+
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return {"email": payload.get("sub")}
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
+    except jwt.InvalidTokenError:
+        raise HTTPException(status_code=401, detail="Invalid token")

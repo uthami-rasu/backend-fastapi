@@ -8,13 +8,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 # User imports
-from models import *
-from rest_schema import *
-from .auth_utils import *
-from utility import * 
 
+from rest_schema import *
+from utility import *
+from models import *
 
 auth = APIRouter()
+
 
 @auth.post("/api/v1/register-user")
 async def register_user(request: UserRegister, dbs: AsyncSession = Depends(get_db)):
@@ -82,20 +82,6 @@ async def verify_token(req: VerifyToken, dbs: AsyncSession = Depends(get_db)):
     )
 
 
-def get_current_user(request: Request):
-    token = request.cookies.get("access_token")
-    print(token, "checking")
-    if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return {"email": payload.get("sub")}
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.InvalidTokenError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-
 async def handle_verification_process(*args):
 
     verify_email_status = await send_verification_email(*args)
@@ -134,7 +120,7 @@ async def login(
     )
     # Set cookie (secure=True should be used with HTTPS)
     response.set_cookie(
-        key="access_token",
+        key="taskease_token",
         value=token,
         httponly=True,
         max_age=TOKEN_EXPIRE_IN_DAYS * 60 * 60 * 24,
@@ -163,7 +149,7 @@ async def logout(response: Response):
     Logout endpoint: Deletes the authentication cookie.
     """
     response.delete_cookie(
-        key="access_token",
+        key="taskease_token",
         httponly=True,
         secure=True,  # Must match token setting
         samesite="None",  # Must match token setting
